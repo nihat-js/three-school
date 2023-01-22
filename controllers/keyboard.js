@@ -1,5 +1,6 @@
-import { cube1 } from "../components/cube1"
-import {arrow } from '../components/arrow'
+import { scene } from "../app"
+import { player } from "../components/player"
+import {arrow , Arrow } from '../components/arrow'
 let downkeys = []
 
 
@@ -27,19 +28,19 @@ function keyController() {
   }
 
   if ( downkeys.indexOf("a") > -1 ){
-    cube1.position.x -= .1
+    player.position.x -= .1
   }
   if ( downkeys.indexOf("d") > -1 ){
-    cube1.position.x += +.1
+    player.position.x += +.1
   }
   if ( downkeys.indexOf("w") > -1 ){
-    cube1.position.z -= .1
+    player.position.z -= .1
   }
   if ( downkeys.indexOf("s") > -1 ){
-    cube1.position.z += .1
+    player.position.z += .1
   }
-  if (downkeys.indexOf("space") > -1){
-
+  if (downkeys.indexOf(" ") > -1){
+     new Arrow()
   }
 
 }

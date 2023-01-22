@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-import { cube1 } from './components/cube1';
+import { player } from './components/player';
 import { plane } from './components/plane';
 import {  arrow } from './components/arrow';
 
@@ -15,9 +15,9 @@ document.body.appendChild(renderer.domElement)
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100) 
 
-const scene = new THREE.Scene()
+export const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x87ceeb)
-scene.add(cube1,plane,arrow)
+scene.add(player,plane,arrow)
 
 
 const controls = new OrbitControls( camera, renderer.domElement );
@@ -26,7 +26,7 @@ controls.update();
 
 
 function render(){
-  camera.position.set(cube1.position.x   , 10   , cube1.position.z+10 )
+  camera.position.set(player.position.x   , 12  , player.position.z+12 )
   camera.rotation.x =-Math.PI/4
   requestAnimationFrame(render)
   renderer.render(scene,camera)

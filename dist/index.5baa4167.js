@@ -557,9 +557,12 @@ function hmrAccept(bundle, id) {
 }
 
 },{}],"igcvL":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "scene", ()=>scene);
 var _three = require("three");
 var _orbitControls = require("three/examples/jsm/controls/OrbitControls");
-var _cube1 = require("./components/cube1");
+var _player = require("./components/player");
 var _plane = require("./components/plane");
 var _arrow = require("./components/arrow");
 var _keyboard = require("./controllers/keyboard");
@@ -570,18 +573,18 @@ document.body.appendChild(renderer.domElement);
 const camera = new _three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
 const scene = new _three.Scene();
 scene.background = new _three.Color(0x87ceeb);
-scene.add((0, _cube1.cube1), (0, _plane.plane), (0, _arrow.arrow));
+scene.add((0, _player.player), (0, _plane.plane), (0, _arrow.arrow));
 const controls = new (0, _orbitControls.OrbitControls)(camera, renderer.domElement);
 controls.update();
 function render() {
-    camera.position.set((0, _cube1.cube1).position.x, 10, (0, _cube1.cube1).position.z + 10);
+    camera.position.set((0, _player.player).position.x, 12, (0, _player.player).position.z + 12);
     camera.rotation.x = -Math.PI / 4;
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
 render();
 
-},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","./components/cube1":"ip9aS","./components/plane":"kSuec","./components/arrow":"97ocq","./controllers/keyboard":"1v4L4"}],"ktPTu":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","./components/player":"69QyH","./components/plane":"kSuec","./components/arrow":"97ocq","./controllers/keyboard":"1v4L4","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"ktPTu":[function(require,module,exports) {
 /**
  * @license
  * Copyright 2010-2022 Three.js Authors
@@ -30585,17 +30588,22 @@ class MapControls extends OrbitControls {
     }
 }
 
-},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"ip9aS":[function(require,module,exports) {
+},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"69QyH":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "cube1", ()=>cube1);
+parcelHelpers.export(exports, "player", ()=>player);
 var _three = require("three");
 const boxGeometry = new _three.BoxGeometry(1, 1, 1);
 const boxMaterial = new _three.MeshBasicMaterial({
     color: 0xff0000
 });
-const cube1 = new _three.Mesh(boxGeometry, boxMaterial);
-cube1.position.set(0, .5, -2);
+const player = new _three.Mesh(boxGeometry, boxMaterial);
+player.position.set(0, .5, -2);
+player.userData = {
+    throwReloadDuration: 1000,
+    nextThrowTime: Date.now(),
+    moveDegree: Math.PI / 360 * 50
+};
 
 },{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"kSuec":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -30614,29 +30622,56 @@ plane.rotation.x = -Math.PI / 2;
 },{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"97ocq":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "arrow", ()=>arrow);
 parcelHelpers.export(exports, "Arrow", ()=>Arrow);
 var _three = require("three");
-const Arrow = {
-    speed: 2,
-    start (speed = this.speed) {
-        setInterval(()=>{
-            arrow.geometry.position.x += speed;
-            arrow.geometry.position.x += speed;
+var _player = require("./player");
+var _app = require("../app");
+class Arrow {
+    constructor(){
+        const arrowGeometry = new _three.BoxGeometry(.2, .2, .5);
+        const arrowMaterial = new _three.MeshBasicMaterial({
+            color: 0x000000,
+            map: new _three.TextureLoader().load("./textures/bullet.svg")
+        });
+        const arrow = new _three.Mesh(arrowGeometry, arrowMaterial);
+        let speed = 2 / 60;
+        let duration = 180;
+        let count = 1;
+        console.log("i don't allow ", (0, _player.player).userData.nextThrowTime);
+        if ((0, _player.player).userData.nextThrowTime > Date.now()) return false;
+        else {
+            arrow.position.set((0, _player.player).position.x, (0, _player.player).position.y, (0, _player.player).position.z);
+            (0, _app.scene).add(arrow);
+            console.log("why");
+            (0, _player.player).userData.nextThrowTime = Date.now() + (0, _player.player).userData.throwReloadDuration;
+        }
+        const timerId = setInterval(()=>{
+            if (count === duration) {
+                (0, _player.player).userData.nextThrowTime = Date.now();
+                (0, _app.scene).remove(arrow);
+                clearInterval(timerId);
+                destructArrow();
+            } else {
+                if ((0, _player.player).userData.moveDegree > 0 && (0, _player.player).userData.moveDegree < 90) {
+                    arrow.position.x -= speed * Math.sin((0, _player.player).userData.moveDegree);
+                    arrow.position.z -= speed * Math.cos((0, _player.player).userData.moveDegree);
+                }
+                count++;
+            }
         }, 1000 / 60);
+        return arrow;
     }
-};
-const arrowGeometry = new _three.BoxGeometry(.2, .2, .5);
-const arrowMaterial = new _three.MeshBasicMaterial({
-    color: 0x000000
-});
-const arrow = new _three.Mesh(arrowGeometry, arrowMaterial);
+}
+function destructArrow(arrow) {
+    arrow = null;
+}
 
-},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"1v4L4":[function(require,module,exports) {
+},{"three":"ktPTu","./player":"69QyH","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N","../app":"igcvL"}],"1v4L4":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "keyboard", ()=>keyboard);
-var _cube1 = require("../components/cube1");
+var _app = require("../app");
+var _player = require("../components/player");
 var _arrow = require("../components/arrow");
 let downkeys = [];
 window.addEventListener("keydown", onKeyDown);
@@ -30652,15 +30687,15 @@ function onKeyUp(e) {
 }
 function keyController() {
     if (downkeys.length == 0) return false;
-    if (downkeys.indexOf("a") > -1) (0, _cube1.cube1).position.x -= .1;
-    if (downkeys.indexOf("d") > -1) (0, _cube1.cube1).position.x += 0.1;
-    if (downkeys.indexOf("w") > -1) (0, _cube1.cube1).position.z -= .1;
-    if (downkeys.indexOf("s") > -1) (0, _cube1.cube1).position.z += .1;
-    downkeys.indexOf("space");
+    if (downkeys.indexOf("a") > -1) (0, _player.player).position.x -= .1;
+    if (downkeys.indexOf("d") > -1) (0, _player.player).position.x += 0.1;
+    if (downkeys.indexOf("w") > -1) (0, _player.player).position.z -= .1;
+    if (downkeys.indexOf("s") > -1) (0, _player.player).position.z += .1;
+    if (downkeys.indexOf(" ") > -1) new (0, _arrow.Arrow)();
 }
 setInterval(keyController, 1000 / 60);
 const keyboard = {};
 
-},{"../components/cube1":"ip9aS","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N","../components/arrow":"97ocq"}]},["22N2Z","igcvL"], "igcvL", "parcelRequire9fa5")
+},{"../components/player":"69QyH","../components/arrow":"97ocq","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N","../app":"igcvL"}]},["22N2Z","igcvL"], "igcvL", "parcelRequire9fa5")
 
 //# sourceMappingURL=index.5baa4167.js.map
