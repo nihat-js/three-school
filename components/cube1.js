@@ -6,5 +6,7 @@ const boxMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 const cube1 = new THREE.Mesh( boxGeometry, boxMaterial );
 cube1.position.set(0,.5,-2)
 
+
+
 export  {cube1} ;
 

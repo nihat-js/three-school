@@ -561,26 +561,27 @@ var _three = require("three");
 var _orbitControls = require("three/examples/jsm/controls/OrbitControls");
 var _cube1 = require("./components/cube1");
 var _plane = require("./components/plane");
+var _arrow = require("./components/arrow");
 var _keyboard = require("./controllers/keyboard");
 const renderer = new _three.WebGLRenderer();
-renderer.setSize(window.innerWidth, innerHeight);
+renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 const camera = new _three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 10, 5);
 const scene = new _three.Scene();
 scene.background = new _three.Color(0x87ceeb);
-scene.add((0, _cube1.cube1));
-scene.add((0, _plane.plane));
+scene.add((0, _cube1.cube1), (0, _plane.plane), (0, _arrow.arrow));
 const controls = new (0, _orbitControls.OrbitControls)(camera, renderer.domElement);
 controls.update();
 function render() {
+    camera.position.set((0, _cube1.cube1).position.x, 10, (0, _cube1.cube1).position.z + 10);
+    camera.rotation.x = -Math.PI / 4;
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
 render();
 
-},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","./components/cube1":"ip9aS","./components/plane":"kSuec","./controllers/keyboard":"1v4L4"}],"ktPTu":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","./components/cube1":"ip9aS","./components/plane":"kSuec","./components/arrow":"97ocq","./controllers/keyboard":"1v4L4"}],"ktPTu":[function(require,module,exports) {
 /**
  * @license
  * Copyright 2010-2022 Three.js Authors
@@ -30610,10 +30611,33 @@ const planeMaterial = new _three.MeshBasicMaterial({
 const plane = new _three.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2;
 
+},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"97ocq":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "arrow", ()=>arrow);
+parcelHelpers.export(exports, "Arrow", ()=>Arrow);
+var _three = require("three");
+const Arrow = {
+    speed: 2,
+    start (speed = this.speed) {
+        setInterval(()=>{
+            arrow.geometry.position.x += speed;
+            arrow.geometry.position.x += speed;
+        }, 1000 / 60);
+    }
+};
+const arrowGeometry = new _three.BoxGeometry(.2, .2, .5);
+const arrowMaterial = new _three.MeshBasicMaterial({
+    color: 0x000000
+});
+const arrow = new _three.Mesh(arrowGeometry, arrowMaterial);
+
 },{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}],"1v4L4":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "keyboard", ()=>keyboard);
+var _cube1 = require("../components/cube1");
+var _arrow = require("../components/arrow");
 let downkeys = [];
 window.addEventListener("keydown", onKeyDown);
 window.addEventListener("keyup", onKeyUp);
@@ -30626,10 +30650,17 @@ function onKeyUp(e) {
     const key = e.key.toLowerCase();
     downkeys = downkeys.filter((x)=>x !== key);
 }
-function keyController() {}
-setInterval(keyController, 1000);
+function keyController() {
+    if (downkeys.length == 0) return false;
+    if (downkeys.indexOf("a") > -1) (0, _cube1.cube1).position.x -= .1;
+    if (downkeys.indexOf("d") > -1) (0, _cube1.cube1).position.x += 0.1;
+    if (downkeys.indexOf("w") > -1) (0, _cube1.cube1).position.z -= .1;
+    if (downkeys.indexOf("s") > -1) (0, _cube1.cube1).position.z += .1;
+    downkeys.indexOf("space");
+}
+setInterval(keyController, 1000 / 60);
 const keyboard = {};
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N"}]},["22N2Z","igcvL"], "igcvL", "parcelRequire9fa5")
+},{"../components/cube1":"ip9aS","@parcel/transformer-js/src/esmodule-helpers.js":"4nB1N","../components/arrow":"97ocq"}]},["22N2Z","igcvL"], "igcvL", "parcelRequire9fa5")
 
 //# sourceMappingURL=index.5baa4167.js.map

@@ -1,3 +1,5 @@
+import { cube1 } from "../components/cube1"
+import {arrow } from '../components/arrow'
 let downkeys = []
 
 
@@ -24,11 +26,25 @@ function keyController() {
     return false
   }
 
-  if ( downkeys.contains("") )
+  if ( downkeys.indexOf("a") > -1 ){
+    cube1.position.x -= .1
+  }
+  if ( downkeys.indexOf("d") > -1 ){
+    cube1.position.x += +.1
+  }
+  if ( downkeys.indexOf("w") > -1 ){
+    cube1.position.z -= .1
+  }
+  if ( downkeys.indexOf("s") > -1 ){
+    cube1.position.z += .1
+  }
+  if (downkeys.indexOf("space") > -1){
+
+  }
 
 }
 
-setInterval(keyController, 1000 / 1)
+setInterval(keyController, 1000 / 60)
 
 
 export const keyboard = {}
